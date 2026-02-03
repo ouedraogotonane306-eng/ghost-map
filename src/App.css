@@ -1,0 +1,418 @@
+/* 全局设置：午夜蓝护眼背景 */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #13192c;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #e2e8f0;
+}
+
+/* 地图容器 */
+.map-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* -------------------
+   🔍 搜索框 (胶囊流光风格)
+   ------------------- */
+.search-box-container {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.85); /* 磨砂黑 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.search-form:focus-within {
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3); /* 聚焦发紫光 */
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-input::placeholder { color: #94a3b8; }
+
+.search-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  padding: 10px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.search-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.search-btn:active { transform: translateY(1px); }
+
+/* ... 之前的所有代码保留 ... */
+
+/* -------------------
+   📜 右侧灵异列表 (指挥面板风格)
+   ------------------- */
+.ghost-sidebar {
+  position: absolute;
+  top: 100px; /* 在搜索框下面 */
+  right: 20px;
+  width: 300px;
+  max-height: 70vh; /* 防止太长超出屏幕 */
+  overflow-y: auto; /* 内容多了可以滚动 */
+  background: rgba(15, 23, 42, 0.85); /* 深色磨砂背景 */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  z-index: 1000; /* 保证浮在地图上面 */
+  box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+/* 列表标题 */
+.sidebar-title {
+  margin: 0 0 15px 0;
+  color: #c084fc;
+  font-size: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 列表里的每一项 */
+.ghost-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.ghost-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(139, 92, 246, 0.5); /* 悬停发光 */
+  transform: translateX(-5px); /* 微微向左动一下，很有科技感 */
+}
+
+.ghost-item h4 {
+  margin: 0 0 5px 0;
+  color: #f1f5f9;
+  font-size: 14px;
+}
+
+.ghost-item p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.distance-tag {
+  color: #6ee7b7; /* 绿色显示距离 */
+  font-weight: bold;
+}
+
+/* 滚动条美化 */
+.ghost-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.ghost-sidebar::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ... 之前的所有代码保留 ... */
+
+/* -------------------
+   🔗 列表里的操作栏
+   ------------------- */
+.sidebar-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end; /* 把按钮挤到右边 */
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* 加一条若隐若现的分隔线 */
+  padding-top: 8px;
+}
+
+.sidebar-btn {
+  background: rgba(99, 102, 241, 0.2); /* 淡蓝色背景 */
+  color: #818cf8; /* 亮蓝色文字 */
+  text-decoration: none; /* 去掉下划线 */
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-btn:hover {
+  background: rgba(99, 102, 241, 0.4);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* -------------------
+   ⚠️ 缩放提示文字
+   ------------------- */
+.zoom-hint {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(0,0,0,0.8);
+  color: #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 20px;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* -------------------
+   🔥 动态鬼火图标 (核心算法)
+   ------------------- */
+.dynamic-ghost-icon .ghost-emoji {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  
+  /* 📐 数学公式：根据 current-zoom 变量自动计算大小 */
+  font-size: max(12px, calc(var(--current-zoom) * 1.8px));
+  
+  transition: font-size 0.2s ease-out; /* 丝滑过渡 */
+  cursor: pointer;
+}
+
+.dynamic-ghost-icon .ghost-emoji:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px red) !important;
+  transition: all 0.1s ease-in;
+}
+
+/* -------------------
+   👻 弹窗样式 (覆盖 Leaflet 默认)
+   ------------------- */
+.leaflet-popup-content-wrapper {
+  background: rgba(67, 68, 71, 0.95) !important;
+  color: #f1f5f9 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+.leaflet-popup-tip { background: rgba(15, 23, 42, 0.95) !important; }
+.leaflet-container a.leaflet-popup-close-button { color: #94a3b8 !important; }
+
+.popup-content h3 { margin: 0 0 8px 0; color: #c084fc; font-size: 18px; }
+.popup-content p { margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #cbd5e1; }
+.popup-content small { display: block; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; color: #94a3b8; }
+
+/* ... (保留之前的所有代码，直接粘贴到最后) ... */
+
+/* -------------------
+   🃏 升级版弹窗卡片样式
+   ------------------- */
+
+/* 图片容器：定高，裁剪，保持比例 */
+.popup-image {
+  width: 100%;
+  height: 120px; /* 控制图片高度 */
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px 8px 0 0; /* 上面圆角，下面直角 */
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.popup-header {
+  margin-bottom: 8px;
+}
+
+/* 🏷️ 分类小标签 */
+.type-badge {
+  display: inline-block;
+  background: rgba(139, 92, 246, 0.2); /* 淡紫色背景 */
+  color: #c084fc; /* 紫色文字 */
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  margin-bottom: 4px;
+}
+
+/* 📍 地址文字 */
+.address-text {
+  font-size: 12px !important;
+  color: #94a3b8 !important; /* 灰色 */
+  margin-bottom: 6px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* 描述文字 */
+.description-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+/* 针对弹窗内容区的微调，去掉默认的一点 padding 让图片贴边 */
+.popup-content {
+  /* 如果你想让图片贴边，可能需要调整父级 padding，但为了简单我们先不做破坏性修改 */
+}
+
+/* ... 之前的所有代码保留 ... */
+
+/* -------------------
+   📂 详情页样式 (机密档案风)
+   ------------------- */
+.details-container {
+    min-height: 100vh;
+    background: #0f172a;
+    padding: 20px;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+
+.loading-screen {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #94a3b8;
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
+.details-nav {
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    text-decoration: none;
+    color: #c084fc;
+    font-weight: bold;
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: rgba(139, 92, 246, 0.2);
+}
+
+.file-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(30, 41, 59, 0.5);
+    padding: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.file-id {
+    display: block;
+    font-family: monospace;
+    color: #64748b;
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.file-header h1 {
+    margin: 0 0 15px 0;
+    font-size: 2.5rem;
+    color: #f8fafc;
+}
+
+.file-meta {
+    display: flex;
+    gap: 20px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.file-image-box img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    border: 1px solid #333;
+}
+
+.file-body p {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    white-space: pre-wrap; /* 保留数据库里的换行 */
+}
+
+.solution-box {
+    margin-top: 40px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 15px;
+    border-radius: 8px;
+    color: #6ee7b7;
+}
+
+/* 按钮样式微调 */
+.popup-btn {
+    display: block;
+    text-align: center;
+    background: #4f46e5;
+    color: white !important;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+.popup-btn:hover {
+    background: #4338ca;
+}
