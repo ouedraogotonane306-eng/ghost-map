@@ -125,6 +125,21 @@ function MapPage() {
   const [password, setPassword] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
 
+  // 📤 上传地点相关状态
+  const [showUploadModal, setShowUploadModal] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const [newPlace, setNewPlace] = useState({
+    name: '',
+    type: 'haunted_location',
+    summary: '',
+    details: '',
+    address: '',
+    latitude: '',
+    longitude: '',
+    level: 1
+  })
+  const [placeImage, setPlaceImage] = useState(null)
+
   useEffect(() => {
     const hasHistory = sessionStorage.getItem('ghostMapCenter');
     if (!hasHistory && 'geolocation' in navigator) {
@@ -187,6 +202,77 @@ function MapPage() {
   async function handleLogout() {
     await supabase.auth.signOut()
     alert('已安全断开连接。')
+  }
+
+  // 📤 提交新地点
+  async function handleSubmitPlace(e) {
+    e.preventDefault()
+    if (!newPlace.name.trim()) return alert('请输入地点名称')
+    if (!newPlace.latitude || !newPlace.longitude) return alert('请输入经纬度坐标')
+
+    setUploadLoading(true)
+    let imageUrl = null
+
+    try {
+      // 上传图片（如果有）
+      if (placeImage) {
+        const fileExt = placeImage.name.split('.').pop()
+        const fileName = `place_${Date.now()}.${fileExt}`
+        const filePath = `places/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('evidence-files')
+          .upload(filePath, placeImage)
+
+        if (uploadError) throw uploadError
+
+        const { data: urlData } = supabase.storage
+          .from('evidence-files')
+          .getPublicUrl(filePath)
+        imageUrl = urlData.publicUrl
+      }
+
+      // 插入数据库
+      const { error: insertError } = await supabase
+        .from('haunted_places')
+        .insert({
+          name: newPlace.name,
+          type: newPlace.type,
+          summary: newPlace.summary,
+          details: newPlace.details,
+          address: newPlace.address,
+          latitude: parseFloat(newPlace.latitude),
+          longitude: parseFloat(newPlace.longitude),
+          level: parseInt(newPlace.level),
+          image_url: imageUrl,
+          status: 'active',
+          country_code: 'cn' // 默认中国，可后续改进
+        })
+
+      if (insertError) throw insertError
+
+      alert('✅ 灵异地点上报成功！')
+      setShowUploadModal(false)
+      setNewPlace({
+        name: '', type: 'haunted_location', summary: '', details: '',
+        address: '', latitude: '', longitude: '', level: 1
+      })
+      setPlaceImage(null)
+      getStories() // 刷新地图数据
+    } catch (error) {
+      alert('❌ 上报失败: ' + error.message)
+    } finally {
+      setUploadLoading(false)
+    }
+  }
+
+  // 📍 使用当前地图中心点填充坐标
+  function useCurrentLocation() {
+    setNewPlace(prev => ({
+      ...prev,
+      latitude: mapCenter[0].toFixed(6),
+      longitude: mapCenter[1].toFixed(6)
+    }))
   }
 
   function updateSidebarList(lat, lon, allStories, boundingBox, searchAddressDetails) {
@@ -256,6 +342,7 @@ function MapPage() {
         {session ? (
           <div className="auth-status logged-in">
              <span className="agent-badge">🟢 特工在线</span>
+             <button onClick={() => setShowUploadModal(true)} className="auth-btn upload">📤 上报</button>
              <button onClick={handleLogout} className="auth-btn logout">断开</button>
           </div>
         ) : (
@@ -272,6 +359,106 @@ function MapPage() {
               <input type="text" placeholder="特工 ID" value={email} onChange={e => setEmail(e.target.value)} autoFocus />
               <input type="password" placeholder="访问口令" value={password} onChange={e => setPassword(e.target.value)} />
               <button type="submit" disabled={authLoading}>{authLoading ? '验证中...' : '确认接入'}</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 📤 上传灵异地点弹窗 */}
+      {showUploadModal && (
+        <div className="modal-overlay" onClick={() => setShowUploadModal(false)}>
+          <div className="modal-content upload-modal" onClick={e => e.stopPropagation()}>
+            <h3>📤 上报灵异地点</h3>
+            <p>填写以下信息提交新发现的灵异事件</p>
+            <form onSubmit={handleSubmitPlace} className="upload-form">
+              <input
+                type="text"
+                placeholder="地点名称 *"
+                value={newPlace.name}
+                onChange={e => setNewPlace({...newPlace, name: e.target.value})}
+                autoFocus
+                required
+              />
+
+              <select
+                value={newPlace.type}
+                onChange={e => setNewPlace({...newPlace, type: e.target.value})}
+                className="type-select"
+              >
+                {Object.entries(typeTranslations).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+
+              <div className="coord-row">
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="纬度 (Latitude) *"
+                  value={newPlace.latitude}
+                  onChange={e => setNewPlace({...newPlace, latitude: e.target.value})}
+                  required
+                />
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="经度 (Longitude) *"
+                  value={newPlace.longitude}
+                  onChange={e => setNewPlace({...newPlace, longitude: e.target.value})}
+                  required
+                />
+                <button type="button" className="use-location-btn" onClick={useCurrentLocation}>
+                  📍 使用地图中心
+                </button>
+              </div>
+
+              <input
+                type="text"
+                placeholder="详细地址（选填）"
+                value={newPlace.address}
+                onChange={e => setNewPlace({...newPlace, address: e.target.value})}
+              />
+
+              <div className="level-row">
+                <label>威胁等级：</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={newPlace.level}
+                  onChange={e => setNewPlace({...newPlace, level: e.target.value})}
+                />
+                <span className="level-value">💀 {newPlace.level}</span>
+              </div>
+
+              <textarea
+                placeholder="简要描述（显示在列表中）"
+                rows="2"
+                value={newPlace.summary}
+                onChange={e => setNewPlace({...newPlace, summary: e.target.value})}
+              />
+
+              <textarea
+                placeholder="详细描述（事件经过、目击详情等）"
+                rows="4"
+                value={newPlace.details}
+                onChange={e => setNewPlace({...newPlace, details: e.target.value})}
+              />
+
+              <label className="file-upload-label">
+                🖼️ 上传图片（选填）
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={e => setPlaceImage(e.target.files[0])}
+                />
+              </label>
+              {placeImage && <span className="file-name">📎 {placeImage.name}</span>}
+
+              <button type="submit" disabled={uploadLoading}>
+                {uploadLoading ? '📡 上传中...' : '✅ 提交上报'}
+              </button>
             </form>
           </div>
         </div>
