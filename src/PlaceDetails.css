@@ -1,0 +1,458 @@
+/* src/PlaceDetails.css - 真正的全屏版本 */
+
+/* 重置所有可能影响宽度的元素 */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 全局容器：强制占满整个屏幕 */
+.details-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+}
+
+/* 档案卡片：完全无限制 */
+.dossier-card {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  border-top: 5px solid #9333ea;
+  position: relative;
+}
+
+.dossier-card::after {
+  content: "TOP SECRET";
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  transform: rotate(-5deg);
+  color: rgba(147, 51, 234, 0.03);
+  font-size: 80px;
+  font-weight: 900;
+  pointer-events: none;
+  font-family: 'Courier New', monospace;
+  z-index: 0;
+}
+
+/* 头部布局：占满宽度 */
+.dossier-header {
+  display: flex;
+  gap: 40px;
+  padding: 20px;
+  width: 100%;
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  box-sizing: border-box;
+}
+
+.header-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.header-image-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.place-hero-image-side {
+  width: 100%;
+  height: 450px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.place-title { 
+  font-size: 56px; 
+  color: #0f172a; 
+  margin: 0; 
+  font-weight: 800; 
+  line-height: 1.1; 
+}
+
+.place-meta { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 15px; 
+}
+
+.meta-tag { 
+  background: white; 
+  padding: 8px 20px; 
+  border-radius: 30px; 
+  color: #475569; 
+  font-weight: 600; 
+  border: 1px solid #cbd5e1; 
+  font-size: 14px; 
+}
+
+.info-box-compact { 
+  background: white; 
+  padding: 30px; 
+  border-radius: 12px; 
+  border: 1px solid #e2e8f0; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+}
+
+.divider-line { 
+  height: 1px; 
+  background: #f1f5f9; 
+  width: 100%; 
+}
+
+.attr-group { 
+  display: flex; 
+  gap: 12px; 
+  align-items: flex-start; 
+}
+
+.attr-icon { 
+  font-size: 20px; 
+  background: #f8fafc; 
+  width: 40px; 
+  height: 40px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-radius: 8px; 
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.attr-content { 
+  flex: 1;
+  min-width: 0;
+}
+
+.attr-label { 
+  display: block; 
+  font-size: 12px; 
+  color: #94a3b8; 
+  margin-bottom: 5px; 
+  font-weight: 700; 
+  letter-spacing: 1px; 
+}
+
+.attr-value { 
+  font-size: 16px; 
+  color: #334155; 
+  font-weight: 600; 
+  line-height: 1.5; 
+}
+
+.address-text { 
+  font-size: 20px; 
+  color: #0f172a; 
+  font-weight: 700; 
+}
+
+.attr-value.mono { 
+  font-family: 'Courier New', monospace; 
+  color: #64748b; 
+  background: #f1f5f9; 
+  padding: 4px 8px; 
+  border-radius: 4px; 
+  font-size: 14px; 
+  display: inline-block; 
+}
+
+.attr-grid { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 30px; 
+}
+
+.warning-box { 
+  background: #fef2f2; 
+  border: 1px solid #fecaca; 
+  border-left: 5px solid #ef4444; 
+  padding: 15px; 
+  color: #b91c1c; 
+  font-size: 14px; 
+  border-radius: 6px; 
+  font-weight: 500; 
+}
+
+/* 主要内容区：完全无限制 */
+.main-content-body {
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.section-title { 
+  color: #1e293b; 
+  font-size: 28px; 
+  border-bottom: 2px solid #e2e8f0; 
+  padding-bottom: 20px; 
+  margin-top: 0; 
+  margin-bottom: 40px; 
+  font-weight: 800; 
+}
+
+.logs-list {
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.log-item { 
+  background: #ffffff; 
+  border: 1px solid #e2e8f0; 
+  border-left: 5px solid #94a3b8; 
+  padding: 30px; 
+  margin-bottom: 30px; 
+  border-radius: 12px; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.log-item:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06); 
+}
+
+.log-item.system-report { 
+  background: #faf5ff; 
+  border-left-color: #9333ea; 
+  border-top: 1px solid #f3e8ff; 
+  border-right: 1px solid #f3e8ff; 
+  border-bottom: 1px solid #f3e8ff; 
+}
+
+.log-item.system-report .agent-name { 
+  color: #9333ea; 
+  font-size: 18px; 
+  font-weight: 800; 
+}
+
+.log-content { 
+  color: #334155; 
+  line-height: 1.8; 
+  font-size: 16px; 
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.log-form-box { 
+  background: #f8fafc; 
+  padding: 30px; 
+  border-radius: 12px; 
+  border: 1px solid #e2e8f0; 
+  margin-bottom: 40px;
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.agent-status { 
+  color: #15803d; 
+  font-family: monospace; 
+  font-size: 14px; 
+  margin-bottom: 20px; 
+  font-weight: bold; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+
+.agent-status::before { 
+  content: ''; 
+  display: inline-block; 
+  width: 8px; 
+  height: 8px; 
+  background: #22c55e; 
+  border-radius: 50%; 
+  box-shadow: 0 0 8px #22c55e; 
+}
+
+.form-row { 
+  display: flex; 
+  gap: 15px; 
+  align-items: center; 
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.agent-input { 
+  width: 250px; 
+  padding: 12px; 
+  border: 1px solid #cbd5e1; 
+  border-radius: 6px; 
+  font-size: 15px; 
+  background: white; 
+}
+
+.log-input { 
+  width: 100%; 
+  padding: 20px; 
+  border: 1px solid #cbd5e1; 
+  border-radius: 6px; 
+  margin-bottom: 20px; 
+  font-family: inherit; 
+  font-size: 16px; 
+  box-sizing: border-box; 
+  background: white; 
+  min-height: 120px; 
+}
+
+.file-upload-btn { 
+  background: white; 
+  color: #475569; 
+  padding: 10px 20px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 14px; 
+  border: 1px solid #cbd5e1; 
+  white-space: nowrap; 
+  transition: 0.2s; 
+}
+
+.file-upload-btn:hover { 
+  background: #f1f5f9; 
+  border-color: #94a3b8; 
+}
+
+.submit-btn { 
+  background: #9333ea; 
+  color: white; 
+  border: none; 
+  padding: 12px 30px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  transition: 0.2s; 
+  font-size: 16px; 
+  box-shadow: 0 4px 6px rgba(147, 51, 234, 0.3); 
+}
+
+.submit-btn:hover { 
+  background: #7e22ce; 
+  transform: translateY(-1px); 
+  box-shadow: 0 6px 12px rgba(147, 51, 234, 0.4); 
+}
+
+.login-hint-box { 
+  text-align: center; 
+  padding: 40px; 
+  background: #f8fafc; 
+  border-radius: 12px; 
+  color: #64748b; 
+  margin-bottom: 40px; 
+  border: 2px dashed #cbd5e1;
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.log-header { 
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 15px; 
+  font-size: 14px; 
+  color: #94a3b8; 
+  border-bottom: 1px solid #f1f5f9; 
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.agent-name { 
+  color: #059669; 
+  font-weight: bold; 
+  font-size: 16px; 
+}
+
+.log-image-wrapper { 
+  margin-top: 20px; 
+  width: 100%;
+}
+
+.log-image { 
+  max-width: 100%; 
+  max-height: 500px; 
+  border-radius: 8px; 
+  border: 1px solid #e2e8f0; 
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: block;
+}
+
+.center-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.loading-text {
+  font-size: 24px;
+  color: #64748b;
+}
+
+/* 手机端适配 */
+@media (max-width: 900px) {
+  .dossier-header { 
+    flex-direction: column; 
+    padding: 20px 15px; 
+  }
+  .place-hero-image-side { 
+    height: 250px; 
+  }
+  .main-content-body { 
+    padding: 15px; 
+  }
+  .place-title { 
+    font-size: 32px; 
+  }
+  .log-item { 
+    padding: 20px; 
+  }
+  .info-box-compact { 
+    padding: 20px; 
+  }
+  .attr-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .agent-input {
+    width: 100%;
+  }
+}

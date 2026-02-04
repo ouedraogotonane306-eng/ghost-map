@@ -1,26 +1,259 @@
-/* 全局设置：午夜蓝护眼背景 */
+/* src/App.css */
+
+/* -------------------
+   🎨 全局变量定义 (明亮风格 / Light Mode)
+   ------------------- */
+:root {
+  /* 背景色：清爽的灰白色 */
+  --bg-deep: #f8fafc;  /* 浅灰蓝背景 */
+  --bg-card: #ffffff;  /* 纯白卡片 */
+  --bg-hover: #f1f5f9; /* 悬停微灰 */
+  
+  /* 文字色 */
+  --text-primary: #0f172a;   /* 深邃黑 (Slate 900) */
+  --text-secondary: #475569; /* 中灰 (Slate 600) */
+  --text-muted: #94a3b8;     /* 浅灰 (Slate 400) */
+
+  /* 强调色 */
+  --accent-purple: #9333ea;  /* 紫色 (主色) */
+  --accent-green: #16a34a;   /* 绿色 (状态/生物) */
+  --accent-red: #e11d48;     /* 红色 (警告/凶宅) */
+  
+  /* 边框 */
+  --border-color: #e2e8f0;   /* 浅灰边框 */
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #13192c;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* 防止地图撑开滚动条 */
 }
 
-/* 地图容器 */
+/* 地图容器全屏 */
 .map-container {
-  width: 100vw;
   height: 100vh;
+  width: 100vw;
   position: relative;
   overflow: hidden;
 }
 
 /* -------------------
-   🔍 搜索框 (胶囊流光风格)
+   🔴 地图标记：彩色圆点 (Color Dots)
+   ------------------- */
+/* Leaflet DivIcon 的容器 */
+.color-dot-icon {
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 实际的圆点 */
+.dot-point {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #ffffff; /* 白边，防止跟地图混色 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* 阴影增加立体感 */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+}
+
+/* 悬停放大效果 */
+.color-dot-icon:hover .dot-point {
+  transform: scale(1.5);
+  z-index: 1000;
+  border-color: var(--text-primary); /* 悬停时边框变深 */
+}
+
+/* 雷达扩散波纹动画 */
+.dot-point::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: inherit; /* 继承父级(圆点)的颜色 */
+  opacity: 0.6;
+  animation: dot-pulse 2s infinite;
+  z-index: -1;
+}
+
+@keyframes dot-pulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* -------------------
+   🔐 右上角身份验证挂件
+   ------------------- */
+.auth-widget {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2000; /* 必须比地图高 */
+  display: flex;
+  align-items: center;
+}
+
+.auth-btn {
+  background: rgba(255, 255, 255, 0.9); /* 亮色半透明 */
+  backdrop-filter: blur(8px);
+  color: var(--accent-purple);
+  border: 1px solid var(--accent-purple);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth-btn:hover {
+  background: var(--accent-purple);
+  color: white;
+  box-shadow: 0 6px 15px rgba(147, 51, 234, 0.3);
+  transform: translateY(-1px);
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 6px 6px 15px;
+  border-radius: 30px;
+  border: 1px solid var(--accent-green);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.agent-badge {
+  color: var(--accent-green);
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.auth-btn.logout {
+  padding: 5px 12px;
+  font-size: 12px;
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  background: transparent;
+  box-shadow: none;
+}
+
+.auth-btn.logout:hover {
+  background: var(--accent-red);
+  color: white;
+}
+
+/* -------------------
+   🔐 全局登录弹窗 (Modal)
+   ------------------- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* 遮罩变浅 */
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  padding: 40px;
+  border-radius: 16px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h3 {
+  color: var(--accent-purple);
+  margin-top: 0;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 25px;
+}
+
+.global-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.global-login-form input {
+  background: #f1f5f9; /* 浅灰输入框 */
+  border: 1px solid #cbd5e1;
+  color: var(--text-primary);
+  padding: 14px;
+  border-radius: 8px;
+  outline: none;
+  text-align: center;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.global-login-form input:focus {
+  border-color: var(--accent-purple);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+}
+
+.global-login-form button {
+  background: var(--accent-purple);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 10px;
+}
+
+.global-login-form button:hover {
+  background: #7e22ce;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+}
+
+/* -------------------
+   🔍 搜索框 (亮色版)
    ------------------- */
 .search-box-container {
   position: absolute;
-  top: 30px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
@@ -30,389 +263,250 @@ body {
 
 .search-form {
   display: flex;
-  align-items: center;
-  background: rgba(30, 41, 59, 0.85); /* 磨砂黑 */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 8px;
+  background: rgba(255, 255, 255, 0.9); /* 白底 */
+  backdrop-filter: blur(10px);
   border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
-}
-
-.search-form:focus-within {
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3); /* 聚焦发紫光 */
-  border-color: rgba(139, 92, 246, 0.5);
+  padding: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .search-input {
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff;
-  padding: 10px 15px;
+  padding: 12px 20px;
+  color: var(--text-primary);
   font-size: 16px;
   outline: none;
 }
 
-.search-input::placeholder { color: #94a3b8; }
-
-.search-btn {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border: none;
-  border-radius: 50px;
-  color: white;
-  padding: 10px 24px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
+.search-input::placeholder {
+  color: var(--text-muted);
 }
 
-.search-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
-.search-btn:active { transform: translateY(1px); }
+.search-btn {
+  background: var(--accent-purple);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  padding: 10px 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-/* ... 之前的所有代码保留 ... */
+.search-btn:hover {
+  background: #7e22ce;
+  box-shadow: 0 4px 10px rgba(126, 34, 206, 0.3);
+}
 
 /* -------------------
-   📜 右侧灵异列表 (指挥面板风格)
+   📜 右侧列表 (固定标题版)
    ------------------- */
 .ghost-sidebar {
   position: absolute;
-  top: 100px; /* 在搜索框下面 */
+  top: 80px;
   right: 20px;
-  width: 300px;
-  max-height: 70vh; /* 防止太长超出屏幕 */
-  overflow-y: auto; /* 内容多了可以滚动 */
-  background: rgba(15, 23, 42, 0.85); /* 深色磨砂背景 */
+  width: 320px;
+  
+  /* ⚡️ 核心 1: 限制总高度，使用 Flex 布局 */
+  max-height: calc(100vh - 120px); 
+  display: flex;
+  flex-direction: column; /* 让标题和内容垂直排列 */
+  
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 15px;
-  z-index: 1000; /* 保证浮在地图上面 */
-  box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
-  transition: transform 0.3s ease;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  z-index: 1000;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  
+  /* ⚡️ 核心 2: 隐藏溢出，防止圆角被内容戳破 */
+  overflow: hidden; 
 }
 
-/* 列表标题 */
-.sidebar-title {
-  margin: 0 0 15px 0;
-  color: #c084fc;
-  font-size: 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 8px;
+/* 1. 头部样式 (固定不动) */
+.sidebar-header {
+  background: #ffffff; /* 纯白背景 */
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  
+  /* Flex 排版 */
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--text-primary);
+  font-weight: bold;
+  font-size: 15px;
+  
+  /* 确保它在最上层 */
+  z-index: 10;
+  flex-shrink: 0; /* 防止被挤压 */
 }
 
-/* 列表里的每一项 */
+/* 2. 内容区域样式 (只有这里能滚动) */
+.sidebar-content {
+  flex: 1; /* 占满剩下的所有空间 */
+  overflow-y: auto; /* 开启滚动条 */
+  padding: 16px; /* 内容的内边距 */
+  
+  /* 滚动条美化 */
+  scrollbar-width: thin;
+}
+
+/* 列表项样式 */
 .ghost-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid transparent;
 }
 
 .ghost-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(139, 92, 246, 0.5); /* 悬停发光 */
-  transform: translateX(-5px); /* 微微向左动一下，很有科技感 */
+  background: #ffffff;
+  border-color: var(--accent-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
-
 .ghost-item h4 {
-  margin: 0 0 5px 0;
-  color: #f1f5f9;
-  font-size: 14px;
+  margin: 0 0 6px 0;
+  color: var(--text-primary);
+  font-size: 15px;
 }
 
 .ghost-item p {
   margin: 0;
-  color: #94a3b8;
-  font-size: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .distance-tag {
-  color: #6ee7b7; /* 绿色显示距离 */
+  color: var(--accent-green);
   font-weight: bold;
+  background: rgba(74, 222, 128, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-/* 滚动条美化 */
-.ghost-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-.ghost-sidebar::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 3px;
-}
-
-/* ... 之前的所有代码保留 ... */
-
-/* -------------------
-   🔗 列表里的操作栏
-   ------------------- */
 .sidebar-actions {
-  margin-top: 8px;
+  margin-top: 10px;
   display: flex;
-  justify-content: flex-end; /* 把按钮挤到右边 */
-  border-top: 1px solid rgba(255, 255, 255, 0.05); /* 加一条若隐若现的分隔线 */
+  justify-content: flex-end;
+  border-top: 1px dashed var(--border-color);
   padding-top: 8px;
 }
 
 .sidebar-btn {
-  background: rgba(99, 102, 241, 0.2); /* 淡蓝色背景 */
-  color: #818cf8; /* 亮蓝色文字 */
-  text-decoration: none; /* 去掉下划线 */
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: 0.2s;
 }
 
 .sidebar-btn:hover {
-  background: rgba(99, 102, 241, 0.4);
+  background: var(--accent-purple);
   color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 /* -------------------
-   ⚠️ 缩放提示文字
-   ------------------- */
-.zoom-hint {
-  position: absolute;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: rgba(0,0,0,0.8);
-  color: #cbd5e1;
-  padding: 10px 20px;
-  border-radius: 20px;
-  pointer-events: none;
-  backdrop-filter: blur(4px);
-  font-size: 14px;
-  letter-spacing: 1px;
-}
-
-/* -------------------
-   🔥 动态鬼火图标 (核心算法)
-   ------------------- */
-.dynamic-ghost-icon .ghost-emoji {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  
-  /* 📐 数学公式：根据 current-zoom 变量自动计算大小 */
-  font-size: max(12px, calc(var(--current-zoom) * 1.8px));
-  
-  transition: font-size 0.2s ease-out; /* 丝滑过渡 */
-  cursor: pointer;
-}
-
-.dynamic-ghost-icon .ghost-emoji:hover {
-  transform: scale(1.2);
-  filter: drop-shadow(0 0 8px red) !important;
-  transition: all 0.1s ease-in;
-}
-
-/* -------------------
-   👻 弹窗样式 (覆盖 Leaflet 默认)
+   🗺️ 地图 Popup (亮色版)
    ------------------- */
 .leaflet-popup-content-wrapper {
-  background: rgba(67, 68, 71, 0.95) !important;
-  color: #f1f5f9 !important;
+  background: #ffffff !important;
+  color: var(--text-primary) !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
+  border: 1px solid white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  padding: 0 !important;
 }
-.leaflet-popup-tip { background: rgba(15, 23, 42, 0.95) !important; }
-.leaflet-container a.leaflet-popup-close-button { color: #94a3b8 !important; }
 
-.popup-content h3 { margin: 0 0 8px 0; color: #c084fc; font-size: 18px; }
-.popup-content p { margin: 0 0 10px 0; font-size: 14px; line-height: 1.5; color: #cbd5e1; }
-.popup-content small { display: block; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; color: #94a3b8; }
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
 
-/* ... (保留之前的所有代码，直接粘贴到最后) ... */
+.popup-content {
+  width: 260px;
+}
 
-/* -------------------
-   🃏 升级版弹窗卡片样式
-   ------------------- */
-
-/* 图片容器：定高，裁剪，保持比例 */
 .popup-image {
   width: 100%;
-  height: 120px; /* 控制图片高度 */
+  height: 120px;
   background-size: cover;
   background-position: center;
-  border-radius: 8px 8px 0 0; /* 上面圆角，下面直角 */
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 11px 11px 0 0;
 }
 
 .popup-header {
-  margin-bottom: 8px;
+  padding: 15px 15px 5px 15px;
 }
 
-/* 🏷️ 分类小标签 */
+.popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
 .type-badge {
   display: inline-block;
-  background: rgba(139, 92, 246, 0.2); /* 淡紫色背景 */
-  color: #c084fc; /* 紫色文字 */
-  padding: 2px 8px;
+  background: var(--accent-purple); /* 默认色，会在JS中被动态覆盖 */
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-size: 11px;
-  font-weight: bold;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
-/* 📍 地址文字 */
-.address-text {
-  font-size: 12px !important;
-  color: #94a3b8 !important; /* 灰色 */
-  margin-bottom: 6px !important;
-  display: flex;
-  align-items: center;
-}
-
-/* 描述文字 */
-.description-text {
-  font-size: 13px;
-  line-height: 1.5;
-  color: #e2e8f0;
-}
-
-/* 针对弹窗内容区的微调，去掉默认的一点 padding 让图片贴边 */
-.popup-content {
-  /* 如果你想让图片贴边，可能需要调整父级 padding，但为了简单我们先不做破坏性修改 */
-}
-
-/* ... 之前的所有代码保留 ... */
-
-/* -------------------
-   📂 详情页样式 (机密档案风)
-   ------------------- */
-.details-container {
-    min-height: 100vh;
-    background: #0f172a;
-    padding: 20px;
-    color: #e2e8f0;
-    box-sizing: border-box;
-}
-
-.loading-screen {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #94a3b8;
-    font-family: monospace;
-    font-size: 1.2rem;
-}
-
-.details-nav {
-    margin-bottom: 20px;
-}
-
-.back-btn {
-    text-decoration: none;
-    color: #c084fc;
-    font-weight: bold;
-    border: 1px solid rgba(139, 92, 246, 0.5);
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.back-btn:hover {
-    background: rgba(139, 92, 246, 0.2);
-}
-
-.file-content {
-    max-width: 800px;
-    margin: 0 auto;
-    background: rgba(30, 41, 59, 0.5);
-    padding: 40px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.file-id {
-    display: block;
-    font-family: monospace;
-    color: #64748b;
-    margin-bottom: 5px;
-    letter-spacing: 2px;
-}
-
-.file-header h1 {
-    margin: 0 0 15px 0;
-    font-size: 2.5rem;
-    color: #f8fafc;
-}
-
-.file-meta {
-    display: flex;
-    gap: 20px;
-    color: #94a3b8;
-    font-size: 0.9rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.file-image-box img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 30px;
-    border: 1px solid #333;
-}
-
-.file-body p {
-    line-height: 1.8;
-    font-size: 1.1rem;
-    color: #cbd5e1;
-    white-space: pre-wrap; /* 保留数据库里的换行 */
-}
-
-.solution-box {
-    margin-top: 40px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    padding: 15px;
-    border-radius: 8px;
-    color: #6ee7b7;
-}
-
-/* 按钮样式微调 */
 .popup-btn {
-    display: block;
-    text-align: center;
-    background: #4f46e5;
-    color: white !important;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin-top: 10px;
-    font-size: 12px;
-    transition: background 0.2s;
+  display: block;
+  text-align: center;
+  background: var(--accent-purple); /* 💜 强制统一为紫色 */
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  margin: 10px 15px 15px 15px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(147, 51, 234, 0.2); /* 加一点紫色阴影 */
+  transition: all 0.2s;
 }
+
 .popup-btn:hover {
-    background: #4338ca;
+  background: #7e22ce; /* 深紫色 */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 10px rgba(147, 51, 234, 0.4);
+}
+
+/* 底部提示 */
+.zoom-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.9);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
 }
