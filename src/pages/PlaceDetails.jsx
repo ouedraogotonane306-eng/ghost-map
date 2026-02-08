@@ -1,20 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom' // ❌ 删掉了 Link 引用，因为没地方用了
-import { supabase } from './supabase'
-import './PlaceDetails.css'
-
-// 📚 翻译字典
-const typeTranslations = {
-  haunted_location: '🏠 凶宅', apparition: '👻 目击', cryptid: '🐾 未确认生物',
-  yokai: '👺 妖怪', poltergeist: '🌪️ 骚灵', evp: '📻 异象',
-  anomaly: '🌀 时空异常', ufo: '🛸 UFO', cursed_object: '🎁 诅咒物品',
-  ritual: '🕯️ 仪式', urban_legend: '🔪 都市传说'
-};
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { supabase } from '../supabase'
+import { typeTranslations } from '../constants'
+import '../PlaceDetails.css'
 
 function formatType(type) {
   if (!type) return '❓ 未知类型';
   if (typeTranslations[type]) return typeTranslations[type];
-  return type.replace(/\{/g, ' (').replace(/\}/g, ')').replace(/_/g, ' '); 
+  return type.replace(/\{/g, ' (').replace(/\}/g, ')').replace(/_/g, ' ');
 }
 
 function formatDate(isoString) {
@@ -23,7 +16,7 @@ function formatDate(isoString) {
     return new Date(isoString).toLocaleString('zh-CN', {
       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-  } catch (e) { return isoString; }
+  } catch { return isoString; }
 }
 
 export default function PlaceDetails() {
@@ -31,11 +24,13 @@ export default function PlaceDetails() {
   const [place, setPlace] = useState(null)
   const [loading, setLoading] = useState(true)
   const [logs, setLogs] = useState([])
-  const [session, setSession] = useState(null) 
+  const [session, setSession] = useState(null)
   const [newLog, setNewLog] = useState('')
   const [agentName, setAgentName] = useState('')
   const [uploading, setUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
+  const [placeTags, setPlaceTags] = useState([])
+  const [newTagInput, setNewTagInput] = useState('')
 
   useEffect(() => {
     fetchPlaceAndLogs()
@@ -50,7 +45,7 @@ export default function PlaceDetails() {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (placeError) {
       console.error("读取地点失败:", placeError)
       setLoading(false)
@@ -66,18 +61,15 @@ export default function PlaceDetails() {
 
     if (logError) console.error("读取日志失败:", logError)
 
-    const initialReportContent = `【📋 案情简报】\n${placeData.summary || '暂无简报'}\n\n【📄 事件详述 / Incident Report】\n${placeData.details || '暂无详细记录'}`;
-    
-    const initialReport = {
-      id: 'initial-system-report', 
-      agent_name: '📁 系统原案存档', 
-      created_at: placeData.occurred_at || placeData.created_at, 
-      content: initialReportContent,
-      image_url: null, 
-      isSystemReport: true 
-    };
+    setLogs(logData || [])
 
-    setLogs([initialReport, ...(logData || [])]);
+    // Fetch tags
+    const { data: tagData } = await supabase
+      .from('place_tags')
+      .select('id, tag_id, tags ( id, name )')
+      .eq('place_id', id)
+    setPlaceTags((tagData || []).map(pt => ({ placeTagId: pt.id, ...pt.tags })).filter(t => t.id))
+
     setLoading(false)
   }
 
@@ -114,11 +106,45 @@ export default function PlaceDetails() {
       if (insertError) throw insertError
       setNewLog('')
       setSelectedFile(null)
-      fetchPlaceAndLogs() 
+      fetchPlaceAndLogs()
     } catch (error) {
       alert('情报上传失败: ' + error.message)
     } finally {
       setUploading(false)
+    }
+  }
+
+  async function handleAddTag() {
+    const tagName = newTagInput.trim()
+    if (!tagName) return
+    try {
+      const { data: tagData } = await supabase
+        .from('tags')
+        .upsert({ name: tagName }, { onConflict: 'name' })
+        .select('id')
+        .single()
+
+      if (tagData) {
+        await supabase
+          .from('place_tags')
+          .insert({ place_id: id, tag_id: tagData.id })
+      }
+      setNewTagInput('')
+      fetchPlaceAndLogs()
+    } catch (err) {
+      console.error('添加标签失败:', err.message)
+    }
+  }
+
+  async function handleRemoveTag(placeTagId) {
+    try {
+      await supabase
+        .from('place_tags')
+        .delete()
+        .eq('id', placeTagId)
+      fetchPlaceAndLogs()
+    } catch (err) {
+      console.error('删除标签失败:', err.message)
     }
   }
 
@@ -127,18 +153,42 @@ export default function PlaceDetails() {
 
   return (
     <div className="details-container">
-      {/* ❌ 删除了这里的 <nav> 返回按钮区域 </nav> */}
-
       <div className="dossier-card">
-        
+
         <header className="dossier-header">
           <div className="header-info-col">
             <h1 className="place-title">{place.name}</h1>
             <div className="place-meta">
               <span className="meta-tag">📍 {place.country_code ? place.country_code.toUpperCase() : '未知'}</span>
               <span className="meta-tag">💀 威胁等级: {place.level || 1}</span>
-              <span className="meta-tag" style={{backgroundColor: 'var(--accent-purple)', color:'white'}}>👁️ {formatType(place.type)}</span>
+              <span className="meta-tag" style={{ backgroundColor: 'var(--accent-purple)', color: 'white' }}>👁️ {formatType(place.type)}</span>
             </div>
+
+            {(placeTags.length > 0 || session) && (
+              <div className="place-tags">
+                {placeTags.map(tag => (
+                  <span key={tag.id} className="tag-chip">
+                    {tag.name}
+                    {session && (
+                      <button className="tag-remove-btn" onClick={() => handleRemoveTag(tag.placeTagId)}>x</button>
+                    )}
+                  </span>
+                ))}
+                {session && (
+                  <span className="tag-add-section">
+                    <input
+                      type="text"
+                      placeholder="新标签..."
+                      value={newTagInput}
+                      onChange={e => setNewTagInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag() } }}
+                      className="tag-add-input"
+                    />
+                    <button onClick={handleAddTag} className="tag-add-btn">+</button>
+                  </span>
+                )}
+              </div>
+            )}
 
             <div className="info-box-compact">
               <div className="attr-group full-width">
@@ -161,6 +211,11 @@ export default function PlaceDetails() {
                     <div className="attr-value">
                       {formatDate(place.occurred_at || place.created_at)}
                     </div>
+                    {place.summary && (
+                      <div className="attr-value" style={{ marginTop: '8px', fontSize: '14px', fontWeight: 'normal', color: '#475569' }}>
+                        {place.summary}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -182,8 +237,8 @@ export default function PlaceDetails() {
           </div>
 
           <div className="header-image-col">
-            <div 
-              className="place-hero-image-side" 
+            <div
+              className="place-hero-image-side"
               style={{ backgroundImage: `url(${place.image_url || 'https://via.placeholder.com/1200x500?text=NO+IMAGE'})` }}
             ></div>
           </div>
@@ -227,7 +282,7 @@ export default function PlaceDetails() {
                 <div className="log-content" style={{ whiteSpace: 'pre-wrap' }}>{log.content}</div>
                 {log.image_url && (
                   <div className="log-image-wrapper">
-                    <img src={log.image_url} alt="Evidence" className="log-image"/>
+                    <img src={log.image_url} alt="Evidence" className="log-image" />
                   </div>
                 )}
               </div>

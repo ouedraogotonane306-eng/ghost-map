@@ -1,0 +1,61 @@
+/* src/variables.css */
+
+/* -------------------
+   🎨 全局变量定义 (明亮风格 / Light Mode)
+   ------------------- */
+:root {
+    /* 背景色 */
+    --bg-deep: #f8fafc;
+    /* 浅灰蓝背景 (Slate 50) */
+    --bg-card: #ffffff;
+    /* 纯白卡片 */
+    --bg-hover: #f1f5f9;
+    /* 悬停微灰 (Slate 100) */
+
+    /* 文字色 */
+    --text-primary: #0f172a;
+    /* 深邃黑 (Slate 900) */
+    --text-secondary: #475569;
+    /* 中灰 (Slate 600) */
+    --text-muted: #94a3b8;
+    /* 浅灰 (Slate 400) */
+    --text-light: #64748b;
+    /* 次浅灰 (Slate 500) */
+
+    /* 强调色 - 紫色 */
+    --accent-purple: #9333ea;
+    /* 主色 (Purple 600) */
+    --accent-purple-hover: #7e22ce;
+    /* 悬停深紫 (Purple 700) */
+    --accent-purple-light: #f3e8ff;
+    /* 浅紫背景 (Purple 100) */
+    --accent-purple-border: #e9d5ff;
+    /* 浅紫边框 (Purple 200) */
+
+    /* 强调色 - 绿色 */
+    --accent-green: #16a34a;
+    /* 状态/生物 (Green 600) */
+    --accent-green-hover: #15803d;
+    /* 深绿 (Green 700) */
+    --accent-green-light: #dcfce7;
+    /* 浅绿背景 (Green 100) */
+
+    /* 强调色 - 红色 */
+    --accent-red: #e11d48;
+    /* 警告/凶宅 (Rose 600) */
+    --accent-red-hover: #be123c;
+    /* 深红 (Rose 700) */
+    --accent-red-light: #ffe4e6;
+    /* 浅红背景 (Rose 100) */
+    --accent-red-border: #fecaca;
+    /* 浅红边框 (Rose 200) */
+
+    /* 边框 */
+    --border-color: #e2e8f0;
+    /* 浅灰边框 (Slate 200) */
+    --border-color-dark: #cbd5e1;
+    /* 深灰边框 (Slate 300) */
+
+    /* 字体 */
+    --font-mono: 'Courier New', monospace;
+}
