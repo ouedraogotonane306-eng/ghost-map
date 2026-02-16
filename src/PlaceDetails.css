@@ -341,43 +341,64 @@ body,
 }
 
 .file-upload-btn {
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #475569;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid var(--border-color-dark);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-top-color: rgba(255, 255, 255, 0.65);
   white-space: nowrap;
-  transition: 0.2s;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.04);
 }
 
 .file-upload-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .submit-btn {
-  background: var(--accent-purple);
+  background: rgba(147, 51, 234, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(255, 255, 255, 0.5);
+  border-left-color: rgba(255, 255, 255, 0.35);
   padding: 12px 30px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.2s;
+  transition: all 0.25s ease;
   font-size: 16px;
-  box-shadow: 0 4px 6px rgba(147, 51, 234, 0.3);
+  box-shadow:
+    0 4px 12px rgba(147, 51, 234, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
 }
 
 .submit-btn:hover {
-  background: var(--accent-purple-hover);
+  background: rgba(126, 34, 206, 0.55);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(147, 51, 234, 0.4);
+  box-shadow:
+    0 6px 20px rgba(147, 51, 234, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .login-hint-box {
@@ -463,20 +484,30 @@ body,
 }
 
 .place-tags .tag-remove-btn {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-top-color: rgba(255, 255, 255, 0.6);
   color: var(--accent-purple);
   cursor: pointer;
   font-size: 13px;
-  padding: 0 2px;
+  padding: 1px 4px;
   line-height: 1;
-  opacity: 0.6;
-  transition: 0.2s;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03);
 }
 
 .place-tags .tag-remove-btn:hover {
-  opacity: 1;
   color: var(--accent-red);
+  background: rgba(225, 29, 72, 0.15);
+  border-color: rgba(225, 29, 72, 0.25);
+  box-shadow:
+    0 3px 8px rgba(225, 29, 72, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .tag-add-section {
@@ -501,9 +532,12 @@ body,
 }
 
 .tag-add-btn {
-  background: var(--accent-purple);
+  background: rgba(147, 51, 234, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.55);
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -512,13 +546,23 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s;
+  transition: all 0.25s ease;
   line-height: 1;
+  box-shadow:
+    0 3px 8px rgba(147, 51, 234, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.06);
 }
 
 .tag-add-btn:hover {
-  background: var(--accent-purple-hover);
+  background: rgba(126, 34, 206, 0.55);
   transform: scale(1.1);
+  box-shadow:
+    0 5px 16px rgba(147, 51, 234, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
 }
 
 /* 手机端适配 */
